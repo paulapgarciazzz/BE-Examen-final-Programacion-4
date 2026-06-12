@@ -106,7 +106,7 @@ namespace LibraryService.WebAPI
             {
                 app.UseDeveloperExceptionPage();
 
-
+            }
                 // Enable middleware to serve generated Swagger as a JSON endpoint.
                 app.UseSwagger();
 
@@ -115,7 +115,7 @@ namespace LibraryService.WebAPI
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "LibraryService API v1");
                 });
-            }
+            
 
 
 
