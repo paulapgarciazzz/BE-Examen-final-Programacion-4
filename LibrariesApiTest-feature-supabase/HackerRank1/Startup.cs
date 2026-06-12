@@ -63,9 +63,9 @@ namespace LibraryService.WebAPI
             // 4. Configurar Autorizacion
             services.AddAuthorization();
 
-            // 5. Configurar CORS para el FE (Vite dev server)
+            // 5. Configurar CORS para el FE (desarrollo y producción)
             services.AddCors(o => o.AddPolicy("Frontend", p => p
-                .WithOrigins("http://localhost:5173")
+                .AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod()));
 
@@ -73,6 +73,7 @@ namespace LibraryService.WebAPI
             // Add support for Dependency Injection for internal services (BooksService and LibrariesService)
             services.AddTransient<ILibrariesService,  LibrariesService>();
             services.AddTransient<IBooksService,  BooksService>();
+            services.AddTransient<IFraudService, FraudService>();
 
             services.AddDbContextPool<LibraryContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
@@ -118,10 +119,17 @@ namespace LibraryService.WebAPI
 
 
 
-            using (var scope = app.ApplicationServices.CreateScope())
+            try
             {
-                var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
-                db.Database.Migrate();
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+                    db.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARN] Migration failed: {ex.Message}");
             }
 
             app.UseRouting();
