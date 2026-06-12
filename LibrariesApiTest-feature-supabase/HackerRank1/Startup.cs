@@ -119,10 +119,17 @@ namespace LibraryService.WebAPI
 
 
 
-            using (var scope = app.ApplicationServices.CreateScope())
+            try
             {
-                var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
-                db.Database.Migrate();
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+                    db.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[WARN] Migration failed: {ex.Message}");
             }
 
             app.UseRouting();
